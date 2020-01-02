@@ -1,30 +1,31 @@
 if ( SERVER ) then
-    AddCSLuaFile()
+	AddCSLuaFile()
+	util.PrecacheSound("Phoenix-Roar.mp3")
 end
 
 function ROLE:PreInitialize()
-    self.color   = Color( 15, 67, 54, 255 )
+    self.color                      = Color( 15, 67, 54, 255 )
 
-    self.abbr    = "occul"
-    self.surviveBonus = 0
-    self.scoreKillsMultiplier = 1
-    self.scoreTeamKillsMultiplier = -16
-    self.preventFindCredits = true
-    self.preventKillCredits = true
+    self.abbr                       = "occul"
+    self.surviveBonus               = 0
+    self.scoreKillsMultiplier       = 1
+    self.scoreTeamKillsMultiplier   = -16
+    self.preventFindCredits         = true
+    self.preventKillCredits         = true
     self.preventTraitorAloneCredits = true
-    self.preventWin = false
-    self.unknownTeam = true
+    self.preventWin                 = false
+    self.unknownTeam                = true
 
-    self.defaultTeam = TEAM_INNOCENT
+    self.defaultTeam                = TEAM_INNOCENT
 
     self.conVarData = {
-		pct = 0.15, -- necessary: percentage of getting this role selected (per player)
-		maximum = 1, -- maximum amount of roles in a round
-		minPlayers = 7, -- minimum amount of players until this role is able to get selected
-		credits = 0, -- the starting credits of a specific role
+		pct          = 0.15, -- necessary: percentage of getting this role selected (per player)
+		maximum      = 1, -- maximum amount of roles in a round
+		minPlayers   = 7, -- minimum amount of players until this role is able to get selected
+		credits      = 0, -- the starting credits of a specific role
 		shopFallback = SHOP_DISABLED,
-		togglable = true, -- option to toggle a role for a client if possible (F1 menu)
-		random = 33
+		togglable    = true, -- option to toggle a role for a client if possible (F1 menu)
+		random       = 33
     }
 end
 
@@ -67,22 +68,25 @@ if ( SERVER ) then
 		ply:RemoveEquipmentItem('item_ttt_nofiredmg')
 	end
 
-	for _, ply in pairs(player.GetAll) do
-		if ply:GetSubRole() == ROLE_OCCULTIST then
-			if ply:Health() < 25 then
-				hook.Add("PlayerDeath", "OcculDies", function(victim, inflictor, attacker)
-					if victim:GetSubRole() == ROLE_OCCULTIST then
-						victim:Ignite( 10 )
-						victim:Revive(10, function(p) 
-							p:EmitSound("Phoenix-Roar.mp3")
-						end)
-						
-						hook.Remove("PlayerDeath", "OcculDies")
-					end
-				end)
+	function OcculRevival(victim, inflictor, attacker)
+		if victim:GetSubRole() == ROLE_OCCULTIST then
+			victim:Ignite( 15 )
+			victim:Revive(10, function(p)
+				p:EmitSound("Phoenix-Roar.mp3")
+			end)
+			
+			hook.Remove("PlayerDeath", "OcculDies")
+		end	
+	end
+
+	hook.Add("EntityTakeDamage", "OcculIsDamaged", function(target)
+		if ( target:IsPlayer() and target:GetSubRole()  == ROLE_OCCULTIST ) then
+			if target:Health() < 25 then
+				hook.Add("PlayerDeath", "OcculDies", OcculRevival)
+				hook.Remove("EntityTakeDamage", "OcculIsDamaged")
 			end
 		end
-	end
+	end)
 
 	hook.Add("TTTEndRound","CleanUpOccul", function()
 		hook.Remove("PlayerDeath", "OcculDies")
