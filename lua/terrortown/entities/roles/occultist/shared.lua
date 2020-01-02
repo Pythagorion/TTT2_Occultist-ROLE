@@ -74,7 +74,9 @@ if ( SERVER ) then
 			victim:Revive(10, function(p)
 				p:EmitSound("Phoenix-Roar.mp3")
 			end)
-			
+			if attacker:Health() > 85 then
+				attacker:Ignite( 5 )
+			end	
 			hook.Remove("PlayerDeath", "OcculDies")
 		end	
 	end
