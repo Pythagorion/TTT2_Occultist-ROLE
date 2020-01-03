@@ -1,7 +1,15 @@
-if ( SERVER ) then
+if SERVER then
 	AddCSLuaFile()
 	util.PrecacheSound("Phoenix-Roar.mp3")
 end
+
+sound.Add({
+	name = "occultist_respawn",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 160,
+	sound = "Phoenix-Roar.mp3"
+})
 
 function ROLE:PreInitialize()
 	self.color                      = Color(15, 67, 54, 255)
@@ -37,7 +45,7 @@ function ROLE:Initialize()
 		LANG.AddToLanguage("English", OCCULTIST.name, "Occultist")
 		LANG.AddToLanguage("English", "info_popup_" .. OCCULTIST.name,
 			[[You are the Occultist!
-			You´ve done a ritual successfully. Now you can get back to life when your HP fall under 25. If you get one-shotted, you're ritual won't take effect.]])
+			You´ve done a ritual successfully. Now you can get back to life when your HP fall under 25. If you get one-shotted, you"re ritual won"t take effect.]])
 		LANG.AddToLanguage("English", "body_found_" .. OCCULTIST.abbr, "They were an Occultist.")
 		LANG.AddToLanguage("English", "search_role_" .. OCCULTIST.abbr, "This person was an Occultist!")
 		LANG.AddToLanguage("English", "target_" .. OCCULTIST.name, "Occultist")
@@ -47,7 +55,7 @@ function ROLE:Initialize()
 		LANG.AddToLanguage("Deutsch", OCCULTIST.name, "Okkultist")
 		LANG.AddToLanguage("Deutsch", "info_popup_" .. OCCULTIST.name,
 			[[Du bist ein Okkultist!
-			Du hast ein Ritual erfolgreich vollendet. Jetzt kannst du aus dem Totenreich zurückkehren, falls deine HP unter 25 fallen. Wirst jedoch ge-oneshotted, wird das Ritual dich nicht zurückholen können.]])
+			Du hast ein Ritual erfolgreich vollendet. Jetzt kannst du aus dem Totenreich zurückkehren, falls deine HP unter 25 fallen. Wirst du jedoch ge-oneshotted, wird das Ritual dich nicht zurückholen können.]])
 		LANG.AddToLanguage("Deutsch", "body_found_" .. OCCULTIST.abbr, "Er war ein Okkultist!")
 		LANG.AddToLanguage("Deutsch", "search_role_" .. OCCULTIST.abbr, "Diese Person war ein Okkultist!")
 		LANG.AddToLanguage("Deutsch", "target_" .. OCCULTIST.name, "Okkultist")
@@ -67,29 +75,132 @@ if SERVER then
 		ply:RemoveEquipmentItem("item_ttt_nofiredmg")
 	end
 
-	function OcculRevival(victim, inflictor, attacker)
-		if victim:GetSubRole() == ROLE_OCCULTIST then
-			victim:Ignite( 15 )
-			victim:Revive(10, function(p)
-				p:EmitSound("Phoenix-Roar.mp3")
-			end)
-			if attacker:Health() > 85 then
-				attacker:Ignite( 5 )
-			end
-			hook.Remove("PlayerDeath", "OcculDies")
+	local function ClearOccultist()
+		local plys = player.GetAll()
+
+		for i = 1, #plys do
+			local ply = plys[i]
+
+			ply.occ_data = {}
+			ply.occ_data.was_revived = false
+			ply.occ_data.allow_revival = false
 		end
 	end
 
-	hook.Add("EntityTakeDamage", "OcculIsDamaged", function(target)
-		if target:IsPlayer() and target:GetSubRole() == ROLE_OCCULTIST then
-			if target:Health() < 25 then
-				hook.Add("PlayerDeath", "OcculDies", OcculRevival)
-				hook.Remove("EntityTakeDamage", "OcculIsDamaged")
+	hook.Add("TTT2PostPlayerDeath", "ttt2_role_occultist_post_player_death", function(ply)
+		if ply:GetSubRole() ~= ROLE_OCCULTIST then return end
+
+		-- only respawn when occ respawn was not triggered this round and player crossed revival threashold
+		if ply.occ_data.was_revived or not ply.occ_data.allow_revival then return end
+
+		-- store the death posistion
+		ply.occ_data.death_pos = ply:GetPos()
+
+		-- cache time
+		local revive_time = GetConVar("ttt2_occul_respawn_time"):GetInt()
+
+		for i = 1, 10 do
+			local jitter = VectorRand() * 65
+			jitter.z = 0
+
+			-- spawn fire at death position
+			local fire = ents.Create("env_fire")
+
+			fire:SetPos(ply:GetPos() + jitter)
+			fire:SetKeyValue("targetname", "fire")
+			fire:SetKeyValue("health", tostring(revive_time * 2))
+			fire:SetKeyValue("fireattack", "0")
+			fire:SetKeyValue("ignitionpoint", "0")
+			fire:SetKeyValue("firesize", "500")
+			fire:SetKeyValue("StartDisabled", "0")
+			fire:SetKeyValue("spawnflags", 128 + 2)
+			fire:SetKeyValue("damagescale", "20")
+			fire:Spawn()
+			fire:SetOwner(ply)
+
+			fire:Fire("StartFire","","0")
+
+			-- only play sound for first fire ent
+			if i == 1 then
+				fire:EmitSound("ambient/fire/ignite.wav", 100, 100)
 			end
+		end
+
+		ply:Revive(revive_time, function(p)
+			-- porting the player to his death position
+			p:SetPos(p.occ_data.death_pos)
+
+			-- et player HP to 50
+			p:SetHealth(p:GetMaxHealth())
+
+			-- set was revived flag
+			p.occ_data.was_revived = true
+
+			-- make sound
+			p:EmitSound("occultist_respawn")
+		end,
+		function(p)
+			-- make sure the revival is still valid
+			return GetRoundState() == ROUND_ACTIVE and IsValid(p) and not p:Alive() and not p.occ_data.was_revived and ply.occ_data.allow_revival
+		end,
+		false, -- no corpse needed for respawn
+		true, -- force revival
+		function(p)
+			-- on fail todo
+		end)
+	end)
+
+	local next_think = 0
+	local cv_occul_health_threshold
+
+	hook.Add("Think", "ttt2_role_occultist_think", function()
+		cv_occul_health_threshold = cv_occul_health_threshold or GetConVar("ttt2_occul_health_threshold")
+
+		if CurTime() < next_think then return end
+
+		-- only check for health 4 times a second
+		next_think = CurTime() + 0.25
+
+		local plys = player.GetAll()
+
+		for i = 1, #plys do
+			local ply = plys[i]
+
+			-- player must be occultist
+			if ply:GetSubRole() ~= ROLE_OCCULTIST then continue end
+
+			-- player is not allowed to be revived twice
+			if ply.occ_data.was_revived then continue end
+
+			-- player HP must hit below a threshold
+			if ply:Health() > cv_occul_health_threshold:GetInt() or ply:Health() <= 0 then continue end
+
+			-- set flag to allow revival
+			ply.occ_data.allow_revival = true
+
+			-- set status icon
+			STATUS:AddStatus(ply, "ttt2_occultist_revival")
 		end
 	end)
 
-	hook.Add("TTTEndRound","CleanUpOccul", function()
-		hook.Remove("PlayerDeath", "OcculDies")
+	hook.Add("TTTEndRound","ttt2_role_occultist_roundend", function()
+		ClearOccultist()
+	end)
+
+	hook.Add("TTTBeginRound","ttt2_role_occultist_roundbegin", function()
+		ClearOccultist()
+	end)
+
+	hook.Add("TTTPrepareRound","ttt2_role_occultist_roundprep", function()
+		ClearOccultist()
+	end)
+end
+
+if CLIENT then
+	hook.Add("Initialize", "ttt2_role_collultist_init", function()
+		STATUS:RegisterStatus("ttt2_occultist_revival", {
+			hud = Material("vgui/ttt/hud_icon_occ_revival.png"),
+			type = "good"
+		})
 	end)
 end
