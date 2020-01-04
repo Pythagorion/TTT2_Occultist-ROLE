@@ -1,6 +1,10 @@
 if SERVER then
 	AddCSLuaFile()
+
 	util.PrecacheSound("Phoenix-Roar.wav")
+
+	resource.AddFile("materials/vgui/ttt/dynamic/roles/icon_occul")
+	resource.AddFile("materials/vgui/ttt/hud_icon_occultist_revive.png")
 end
 
 sound.Add({
@@ -97,9 +101,9 @@ if SERVER then
 		ply.occ_data.death_pos = ply:GetPos()
 
 		-- cache time
-		local revive_time = GetConVar("ttt2_occul_respawn_time"):GetInt()
-		local dmgscale_fire = GetConVar("ttt2_occul_fire_damagescale"):GetInt()
-		local fire_radius = GetConVar("ttt2_occul_fire_radius"):GetInt()
+		local revive_time = GetConVar("ttt_occultist_respawn_time"):GetInt()
+		local dmgscale_fire = GetConVar("ttt_occultist_fire_damagescale"):GetInt()
+		local fire_radius = GetConVar("ttt_occultist_fire_radius"):GetInt()
 
 		for i = 1, 10 do
 			local jitter = VectorRand() * 65
@@ -156,7 +160,7 @@ if SERVER then
 	local cv_occul_health_threshold
 
 	hook.Add("Think", "ttt2_role_occultist_think", function()
-		cv_occul_health_threshold = cv_occul_health_threshold or GetConVar("ttt2_occul_health_threshold")
+		cv_occul_health_threshold = cv_occul_health_threshold or GetConVar("ttt_occultist_health_threshold")
 
 		if CurTime() < next_think then return end
 
@@ -201,7 +205,7 @@ end
 if CLIENT then
 	hook.Add("Initialize", "ttt2_role_collultist_init", function()
 		STATUS:RegisterStatus("ttt2_occultist_revival", {
-			hud = Material("vgui/ttt/hud_icon_occ_revival.png"),
+			hud = Material("vgui/ttt/hud_icon_occultist_revive.png"),
 			type = "good"
 		})
 	end)
