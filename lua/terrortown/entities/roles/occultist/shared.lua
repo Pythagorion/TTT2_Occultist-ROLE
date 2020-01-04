@@ -1,6 +1,6 @@
 if SERVER then
 	AddCSLuaFile()
-	util.PrecacheSound("Phoenix-Roar.mp3")
+	util.PrecacheSound("Phoenix-Roar.wav")
 end
 
 sound.Add({
@@ -8,7 +8,7 @@ sound.Add({
 	channel = CHAN_STATIC,
 	volume = 1.0,
 	level = 160,
-	sound = "Phoenix-Roar.mp3"
+	sound = "Phoenix-Roar.wav"
 })
 
 function ROLE:PreInitialize()
