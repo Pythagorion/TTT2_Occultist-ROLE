@@ -1,6 +1,10 @@
 if SERVER then
 	AddCSLuaFile()
+
 	util.PrecacheSound("Phoenix-Roar.wav")
+
+	resource.AddFile("materials/vgui/ttt/dynamic/roles/icon_occul")
+	resource.AddFile("materials/vgui/ttt/hud_icon_occultist_revive.png")
 end
 
 sound.Add({
@@ -201,7 +205,7 @@ end
 if CLIENT then
 	hook.Add("Initialize", "ttt2_role_collultist_init", function()
 		STATUS:RegisterStatus("ttt2_occultist_revival", {
-			hud = Material("vgui/ttt/hud_icon_occ_revival.png"),
+			hud = Material("vgui/ttt/hud_icon_occultist_revive.png"),
 			type = "good"
 		})
 	end)
