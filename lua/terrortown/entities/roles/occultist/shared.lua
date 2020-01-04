@@ -98,6 +98,8 @@ if SERVER then
 
 		-- cache time
 		local revive_time = GetConVar("ttt2_occul_respawn_time"):GetInt()
+		local dmgscale_fire = GetConVar("ttt2_occul_fire_damagescale"):GetInt()
+		local fire_radius = GetConVar("ttt2_occul_fire_radius"):GetInt()
 
 		for i = 1, 10 do
 			local jitter = VectorRand() * 65
@@ -111,10 +113,10 @@ if SERVER then
 			fire:SetKeyValue("health", tostring(revive_time * 2))
 			fire:SetKeyValue("fireattack", "0")
 			fire:SetKeyValue("ignitionpoint", "0")
-			fire:SetKeyValue("firesize", "500")
+			fire:SetKeyValue("firesize", tostring(fire_radius))
 			fire:SetKeyValue("StartDisabled", "0")
 			fire:SetKeyValue("spawnflags", 128 + 2)
-			fire:SetKeyValue("damagescale", "20")
+			fire:SetKeyValue("damagescale", tostring(dmgscale_fire))
 			fire:Spawn()
 			fire:SetOwner(ply)
 
@@ -130,7 +132,7 @@ if SERVER then
 			-- porting the player to his death position
 			p:SetPos(p.occ_data.death_pos)
 
-			-- et player HP to 50
+			-- set player HP to 100
 			p:SetHealth(p:GetMaxHealth())
 
 			-- set was revived flag
