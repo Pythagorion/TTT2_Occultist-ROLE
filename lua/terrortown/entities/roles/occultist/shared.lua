@@ -5,6 +5,8 @@ if SERVER then
 
 	resource.AddFile("materials/vgui/ttt/dynamic/roles/icon_occul")
 	resource.AddFile("materials/vgui/ttt/hud_icon_occultist_revive.png")
+
+	resource.AddFile("sound/occultist_revived.wav")
 end
 
 sound.Add({
@@ -12,7 +14,7 @@ sound.Add({
 	channel = CHAN_STATIC,
 	volume = 1.0,
 	level = 160,
-	sound = "Phoenix-Roar.wav"
+	sound = "occultist_revived.wav"
 })
 
 function ROLE:PreInitialize()
@@ -49,7 +51,8 @@ function ROLE:Initialize()
 		LANG.AddToLanguage("English", OCCULTIST.name, "Occultist")
 		LANG.AddToLanguage("English", "info_popup_" .. OCCULTIST.name,
 			[[You are the Occultist!
-			You´ve done a ritual successfully. Now you can get back to life when your HP fall under 25. If you get one-shotted, you"re ritual won"t take effect.]])
+			You've done a ritual successfully. Now you can get back to life when your HP fall under 25.
+			If you get one shotted, you're ritual won't take effect.]])
 		LANG.AddToLanguage("English", "body_found_" .. OCCULTIST.abbr, "They were an Occultist.")
 		LANG.AddToLanguage("English", "search_role_" .. OCCULTIST.abbr, "This person was an Occultist!")
 		LANG.AddToLanguage("English", "target_" .. OCCULTIST.name, "Occultist")
@@ -59,7 +62,8 @@ function ROLE:Initialize()
 		LANG.AddToLanguage("Deutsch", OCCULTIST.name, "Okkultist")
 		LANG.AddToLanguage("Deutsch", "info_popup_" .. OCCULTIST.name,
 			[[Du bist ein Okkultist!
-			Du hast ein Ritual erfolgreich vollendet. Jetzt kannst du aus dem Totenreich zurückkehren, falls deine HP unter 25 fallen. Wirst du jedoch ge-oneshotted, wird das Ritual dich nicht zurückholen können.]])
+			Du hast ein Ritual erfolgreich vollendet. Jetzt kannst du aus dem Totenreich zurückkehren, falls deine HP unter 25 fallen.
+			Wirst du jedoch geoneshotted, wird das Ritual dich nicht zurückholen können.]])
 		LANG.AddToLanguage("Deutsch", "body_found_" .. OCCULTIST.abbr, "Er war ein Okkultist!")
 		LANG.AddToLanguage("Deutsch", "search_role_" .. OCCULTIST.abbr, "Diese Person war ein Okkultist!")
 		LANG.AddToLanguage("Deutsch", "target_" .. OCCULTIST.name, "Okkultist")
