@@ -1,7 +1,7 @@
 if SERVER then
 	AddCSLuaFile()
 
-	util.PrecacheSound("Phoenix-Roar.wav")
+	util.PrecacheSound("occultist_revived.wav")
 
 	resource.AddFile("materials/vgui/ttt/dynamic/roles/icon_occul")
 	resource.AddFile("materials/vgui/ttt/hud_icon_occultist_revive.png")
