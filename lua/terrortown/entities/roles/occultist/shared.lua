@@ -45,31 +45,6 @@ end
 
 function ROLE:Initialize()
 	roles.SetBaseRole(self, ROLE_INNOCENT)
-
-	if CLIENT then
-		-- Role specific language elements
-		LANG.AddToLanguage("English", OCCULTIST.name, "Occultist")
-		LANG.AddToLanguage("English", "info_popup_" .. OCCULTIST.name,
-			[[You are the Occultist!
-			You've done a ritual successfully. Now you can get back to life when your HP fall under 25.
-			If you get one shotted, you're ritual won't take effect.]])
-		LANG.AddToLanguage("English", "body_found_" .. OCCULTIST.abbr, "They were an Occultist.")
-		LANG.AddToLanguage("English", "search_role_" .. OCCULTIST.abbr, "This person was an Occultist!")
-		LANG.AddToLanguage("English", "target_" .. OCCULTIST.name, "Occultist")
-		LANG.AddToLanguage("English", "ttt2_desc_" .. OCCULTIST.name, [[The Occultist needs to win with the innocents!]])
-		LANG.AddToLanguage("English", "credit_" .. OCCULTIST.abbr .. "_all", "Occultists, you have been awarded {num} equipment credit(s) for your performance.")
-
-		LANG.AddToLanguage("Deutsch", OCCULTIST.name, "Okkultist")
-		LANG.AddToLanguage("Deutsch", "info_popup_" .. OCCULTIST.name,
-			[[Du bist ein Okkultist!
-			Du hast ein Ritual erfolgreich vollendet. Jetzt kannst du aus dem Totenreich zurückkehren, falls deine HP unter 25 fallen.
-			Wirst du jedoch geoneshotted, wird das Ritual dich nicht zurückholen können.]])
-		LANG.AddToLanguage("Deutsch", "body_found_" .. OCCULTIST.abbr, "Er war ein Okkultist!")
-		LANG.AddToLanguage("Deutsch", "search_role_" .. OCCULTIST.abbr, "Diese Person war ein Okkultist!")
-		LANG.AddToLanguage("Deutsch", "target_" .. OCCULTIST.name, "Okkultist")
-		LANG.AddToLanguage("Deutsch", "ttt2_desc_" .. OCCULTIST.name, [[Der Okkultist gewinnt zusammen mit den Unschuldigen!]])
-		LANG.AddToLanguage("Deutsch", "credit_" .. OCCULTIST.abbr .. "_all", "Okkultist(en), dir wurde(n) {num} Ausrüstungs-Credit(s) für deine Leistung gegeben.")
-	end
 end
 
 if SERVER then
