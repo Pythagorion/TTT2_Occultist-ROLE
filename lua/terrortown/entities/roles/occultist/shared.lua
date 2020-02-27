@@ -168,6 +168,21 @@ if SERVER then
 		end
 	end)
 
+	hook.Add("TTT2SpecialRoleSyncing", "ttt2_identity_handler", function(ply, tbl)
+
+		local cv_hiding = GetConVar("ttt_occultist_hide_identity"):GetBool()
+
+		if cv_hiding then
+
+			for occul in pairs(tbl) do
+				if occul:IsTerror() and occul:Alive() and occul:GetSubRole() == ROLE_OCCULTIST then
+					tbl[occul] = {ROLE_INNOCENT, TEAM_INNOCENT}
+				end
+			end		
+		end
+		
+	end)
+
 	hook.Add("TTTEndRound","ttt2_role_occultist_roundend", function()
 		ClearOccultist()
 	end)
