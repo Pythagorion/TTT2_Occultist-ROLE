@@ -9,3 +9,6 @@ L["body_found_" .. OCCULTIST.abbr] = "They were an Occultist."
 L["search_role_" .. OCCULTIST.abbr] = "This person was an Occultist!"
 L["target_" .. OCCULTIST.name] = "Occultist"
 L["ttt2_desc_" .. OCCULTIST.name] = [[The Occultist needs to win with the innocents!]]
+
+-- OTHER ROLE LANGUAGE STRINGS
+L["ttt2_role_occultist_popuptitle"] = "Like a Phoenix, the Occultist rises from their flaming Inferno!"

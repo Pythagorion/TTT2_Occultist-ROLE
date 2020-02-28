@@ -8,6 +8,8 @@ CreateConVar("ttt_occultist_announce_revival_by_popup", 1, {FCVAR_ARCHIVE, FCVAR
 CreateConVar("ttt_occultist_always_spawn_inferno", 1, {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED})
 CreateConVar("ttt_occultist_play_respawn_sound", 1, {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED})
 --CreateConVar("ttt2_occul_ignite_attacker", 1, {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED})
+CreateConVar("ttt_occultist_teleport_to_mapspawn", 0, {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED})
+CreateConVar("ttt_occultist_receive_buff_to_beginning", 1, {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED})
 
 hook.Add("TTTUlxDynamicRCVars", "ttt2_ulx_dynamic_occultist_convars", function(tbl)
 	tbl[ROLE_OCCULTIST] = tbl[ROLE_OCCULTIST] or {}
@@ -20,4 +22,6 @@ hook.Add("TTTUlxDynamicRCVars", "ttt2_ulx_dynamic_occultist_convars", function(t
 	table.insert(tbl[ROLE_OCCULTIST], {cvar = "ttt_occultist_announce_revival_by_popup", checkbox = true, desc = "ttt_occultist_announce_revival_by_popup (def. 1)"})
 	table.insert(tbl[ROLE_OCCULTIST], {cvar = "ttt_occultist_always_spawn_inferno", checkbox = true, desc = "ttt_occultist_always_spawn_inferno (def. 1)"})
 	table.insert(tbl[ROLE_OCCULTIST], {cvar = "ttt_occultist_play_respawn_sound", checkbox = true, desc = "ttt_occultist_play_respawn_sound (def. 1)"})
+	table.insert(tbl[ROLE_OCCULTIST], {cvar = "ttt_occultist_teleport_to_mapspawn", checkbox = true, desc = "ttt_occultist_teleport_to_mapspawn (def. 0)"})
+	table.insert(tbl[ROLE_OCCULTIST], {cvar = "ttt_occultist_receive_buff_to_beginning", checkbox = true, desc = "ttt_occultist_receive_buff_to_beginning (def. 1)"})
 end)
