@@ -45,7 +45,6 @@ function ROLE:PreInitialize()
 	}
 end
 
-
 function ROLE:Initialize()
 	roles.SetBaseRole(self, ROLE_INNOCENT)
 end
@@ -65,16 +64,17 @@ if SERVER then
 	end
 
 	local cv_buff_beginning = GetConVar("ttt_occultist_receive_buff_to_beginning"):GetBool()
-	local cv_always_spawn = GetConVar("ttt_occultist_always_spawn_inferno"):GetBool()
 
-	if cv_buff_beginning then
-		-- Give Loadout on respawn and rolechange
-		function ROLE:GiveRoleLoadout(ply, isRoleChange)
+	-- Give Loadout on respawn and rolechange
+	function ROLE:GiveRoleLoadout(ply, isRoleChange)
+		if cv_buff_beginning then
 			ply:GiveEquipmentItem("item_ttt_nofiredmg")
 		end
+	end	
 
-		-- Remove Loadout on death and rolechange
-		function ROLE:RemoveRoleLoadout(ply, isRoleChange)
+	-- Remove Loadout on death and rolechange
+	function ROLE:RemoveRoleLoadout(ply, isRoleChange)
+		if cv_buff_beginning then
 			ply:RemoveEquipmentItem("item_ttt_nofiredmg")
 		end
 	end	
@@ -82,10 +82,8 @@ if SERVER then
 	hook.Add("TTT2PostPlayerDeath", "ttt2_role_occultist_post_player_death", function(ply)
 		if ply:GetSubRole() ~= ROLE_OCCULTIST then return end
 
-		if not cv_always_spawn then
-			-- only respawn when occ respawn was not triggered this round and player crossed revival threashold
-			if ply.occ_data.was_revived or not ply.occ_data.allow_revival then return end
-		end
+		-- only respawn when occ respawn was not triggered this round and player crossed revival threashold
+		if ply.occ_data.was_revived or not ply.occ_data.allow_revival then return end
 
 		-- store the death posistion
 		ply.occ_data.death_pos = ply:GetPos()
@@ -144,8 +142,6 @@ if SERVER then
 				fire:EmitSound("ambient/fire/ignite.wav", 100, 100)
 			end
 		end
-
-		if cv_always_spawn then return end 
 
 		ply:Revive(revive_time, function(p)
 
