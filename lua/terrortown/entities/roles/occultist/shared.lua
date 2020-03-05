@@ -50,7 +50,6 @@ function ROLE:Initialize()
 end
 
 if SERVER then
-
 	local function ClearOccultist()
 		local plys = player.GetAll()
 
@@ -63,21 +62,19 @@ if SERVER then
 		end
 	end
 
-	local cv_buff_beginning = GetConVar("ttt_occultist_receive_buff_to_beginning"):GetBool()
-
 	-- Give Loadout on respawn and rolechange
 	function ROLE:GiveRoleLoadout(ply, isRoleChange)
-		if cv_buff_beginning then
+		if GetConVar("ttt_occultist_receive_buff_to_beginning"):GetBool() then
 			ply:GiveEquipmentItem("item_ttt_nofiredmg")
 		end
-	end	
+	end
 
 	-- Remove Loadout on death and rolechange
 	function ROLE:RemoveRoleLoadout(ply, isRoleChange)
-		if cv_buff_beginning then
+		if GetConVar("ttt_occultist_receive_buff_to_beginning"):GetBool() then
 			ply:RemoveEquipmentItem("item_ttt_nofiredmg")
 		end
-	end	
+	end
 
 	hook.Add("TTT2PostPlayerDeath", "ttt2_role_occultist_post_player_death", function(ply)
 		if ply:GetSubRole() ~= ROLE_OCCULTIST then return end
@@ -88,33 +85,32 @@ if SERVER then
 		-- store the death posistion
 		ply.occ_data.death_pos = ply:GetPos()
 
-		-- cache time
+		-- cache ConVar values
 		local revive_time = GetConVar("ttt_occultist_respawn_time"):GetInt()
 		local dmgscale_fire = GetConVar("ttt_occultist_fire_damagescale"):GetInt()
 		local fire_radius = GetConVar("ttt_occultist_fire_radius"):GetInt()
-		local phoenix_roar = GetConVar("ttt_occultist_play_respawn_sound"):GetBool()
+		local respawn_sound = GetConVar("ttt_occultist_play_respawn_sound"):GetBool()
 		local cv_mapspawn_teleportation = GetConVar("ttt_occultist_teleport_to_mapspawn"):GetBool()
 		local cv_sending_epop = GetConVar("ttt_occultist_announce_revival_by_popup"):GetBool()
 
 		-- Gathering all available map-spawnpoints
 		local spawnpoints = {}
 
-			spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_start"))
-			spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_deathmatch"))
-			spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_combine"))
-			spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_rebel"))
+		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_start"))
+		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_deathmatch"))
+		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_combine"))
+		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_rebel"))
 
-			-- CS Maps
-			spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_counterterrorist"))
-			spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_terrorist"))
+		-- CS Maps
+		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_counterterrorist"))
+		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_terrorist"))
 
-			-- DOD Maps
-			spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_axis"))
-			spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_allies"))
+		-- DOD Maps
+		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_axis"))
+		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_allies"))
 
-			-- (Old) GMod Maps
-			spawnpoints = table.Add(spawnpoints, ents.FindByClass("gmod_player_start"))
-		
+		-- (Old) GMod Maps
+		spawnpoints = table.Add(spawnpoints, ents.FindByClass("gmod_player_start"))
 
 		for i = 1, 10 do
 			local jitter = VectorRand() * 65
@@ -144,11 +140,10 @@ if SERVER then
 		end
 
 		ply:Revive(revive_time, function(p)
-
 			-- if convar is set, the occul receives here his no fire damage buff
 			if not cv_buff_beginning then
 				p:GiveEquipmentItem("item_ttt_nofiredmg")
-			end	
+			end
 
 			-- if convar is set, send a popup to all players
 			if cv_sending_epop then
@@ -159,7 +154,7 @@ if SERVER then
 			if cv_mapspawn_teleportation then
 				--porting occultist to mapspawn if cvar-boolean is true
 				p:SetPos(spawnpoints[math.random(1, #spawnpoints)]:GetPos())
-			else	
+			else
 				-- porting the player to his death position
 				p:SetPos(p.occ_data.death_pos)
 			end
@@ -171,7 +166,7 @@ if SERVER then
 			p.occ_data.was_revived = true
 
 			-- make sound if boolean is true
-			if phoenix_roar then
+			if respawn_sound then
 				p:EmitSound("occultist_respawn")
 			end
 		end,
@@ -207,7 +202,7 @@ if SERVER then
 
 			-- player is not allowed to be revived twice
 			if ply.occ_data.was_revived then continue end
-			
+
 			-- player HP must hit below a threshold if boolean is false
 			if ply:Health() > cv_occul_health_threshold:GetInt() or ply:Health() <= 0 then continue end
 
@@ -220,18 +215,13 @@ if SERVER then
 	end)
 
 	hook.Add("TTT2SpecialRoleSyncing", "ttt2_occultists_identity_handler", function(ply, tbl)
+		if not GetConVar("ttt_occultist_hide_identity"):GetBool() then return end
 
-		local cv_hiding = GetConVar("ttt_occultist_hide_identity"):GetBool()
-
-		if cv_hiding then
-
-			for occul in pairs(tbl) do
-				if occul:IsTerror() and occul:Alive() and occul:GetSubRole() == ROLE_OCCULTIST then
-					tbl[occul] = {ROLE_INNOCENT, TEAM_INNOCENT}
-				end
-			end		
+		for occul in pairs(tbl) do
+			if occul:IsTerror() and occul:Alive() and occul:GetSubRole() == ROLE_OCCULTIST then
+				tbl[occul] = {ROLE_INNOCENT, TEAM_INNOCENT}
+			end
 		end
-		
 	end)
 
 	hook.Add("TTTEndRound","ttt2_role_occultist_roundend", function()
@@ -248,7 +238,6 @@ if SERVER then
 end
 
 if CLIENT then
-
 	net.Receive("ttt2_occul_role_epop", function()
 		EPOP:AddMessage({text = LANG.GetTranslation("ttt2_role_occultist_popuptitle"), color = OCCULTIST.ltcolor}, "", 10)
 	end)
