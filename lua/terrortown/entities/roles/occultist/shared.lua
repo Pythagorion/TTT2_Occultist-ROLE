@@ -64,14 +64,18 @@ if SERVER then
 
 	-- Give Loadout on respawn and rolechange
 	function ROLE:GiveRoleLoadout(ply, isRoleChange)
-		if GetConVar("ttt_occultist_receive_buff_to_beginning"):GetBool() then
+		if not GetConVar("ttt_occultist_hide_identity"):GetBool() then
+			ply:GiveEquipmentItem("item_ttt_nofiredmg")
+		elseif GetConVar("ttt_occultist_receive_buff_to_beginning"):GetBool() then
 			ply:GiveEquipmentItem("item_ttt_nofiredmg")
 		end
 	end
 
 	-- Remove Loadout on death and rolechange
 	function ROLE:RemoveRoleLoadout(ply, isRoleChange)
-		if GetConVar("ttt_occultist_receive_buff_to_beginning"):GetBool() then
+		if not GetConVar("ttt_occultist_hide_identity"):GetBool() then
+			ply:RemoveEquipmentItem("item_ttt_nofiredmg")
+		elseif GetConVar("ttt_occultist_receive_buff_to_beginning"):GetBool() then
 			ply:RemoveEquipmentItem("item_ttt_nofiredmg")
 		end
 	end
