@@ -82,6 +82,7 @@ if SERVER then
 
 	hook.Add("TTT2PostPlayerDeath", "ttt2_role_occultist_post_player_death", function(ply)
 		if ply:GetSubRole() ~= ROLE_OCCULTIST then return end
+		if SpecDM and (ply.IsGhost and ply:IsGhost()) then return end
 
 		-- only respawn when occ respawn was not triggered this round and player crossed revival threashold
 		if ply.occ_data.was_revived or not ply.occ_data.allow_revival then return end
