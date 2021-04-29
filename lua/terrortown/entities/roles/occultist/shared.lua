@@ -224,7 +224,11 @@ if SERVER then
 
 		for occul in pairs(tbl) do
 			if occul:IsTerror() and occul:Alive() and occul:GetSubRole() == ROLE_OCCULTIST then
-				tbl[occul] = {ROLE_INNOCENT, TEAM_INNOCENT}
+				if ply == occul then
+					tbl[occul] = {ROLE_INNOCENT, TEAM_INNOCENT}
+				else
+					tbl[occul] = {ROLE_NONE, TEAM_NONE}
+				end
 			end
 		end
 	end)
