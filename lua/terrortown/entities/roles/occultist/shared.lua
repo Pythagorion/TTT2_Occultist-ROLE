@@ -87,9 +87,6 @@ if SERVER then
 		-- only respawn when occ respawn was not triggered this round and player crossed revival threashold
 		if ply.occ_data.was_revived or not ply.occ_data.allow_revival then return end
 
-		-- store the death posistion
-		ply.occ_data.death_pos = ply:GetPos()
-
 		-- cache ConVar values
 		local revive_time = GetConVar("ttt_occultist_respawn_time"):GetInt()
 		local dmgscale_fire = GetConVar("ttt_occultist_fire_damagescale"):GetInt()
@@ -98,24 +95,14 @@ if SERVER then
 		local cv_mapspawn_teleportation = GetConVar("ttt_occultist_teleport_to_mapspawn"):GetBool()
 		local cv_sending_epop = GetConVar("ttt_occultist_announce_revival_by_popup"):GetBool()
 
-		-- Gathering all available map-spawnpoints
-		local spawnpoints = {}
-
-		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_start"))
-		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_deathmatch"))
-		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_combine"))
-		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_rebel"))
-
-		-- CS Maps
-		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_counterterrorist"))
-		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_terrorist"))
-
-		-- DOD Maps
-		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_axis"))
-		spawnpoints = table.Add(spawnpoints, ents.FindByClass("info_player_allies"))
-
-		-- (Old) GMod Maps
-		spawnpoints = table.Add(spawnpoints, ents.FindByClass("gmod_player_start"))
+		local spawn_pos = nil
+		if cv_mapspawn_teleportation then
+			-- this function will do many checks to ensure that the randomly selected spawn position is safe.
+			local spawn_entity = spawn.GetRandomPlayerSpawnEntity(ply)
+			if spawn_entity then
+				spawn_pos = spawn_entity:GetPos()
+			end
+		end
 
 		for i = 1, 10 do
 			local jitter = VectorRand() * 65
@@ -156,19 +143,14 @@ if SERVER then
 				net.Broadcast()
 			end
 
-			if cv_mapspawn_teleportation then
-				--porting occultist to mapspawn if cvar-boolean is true
-				p:SetPos(spawnpoints[math.random(1, #spawnpoints)]:GetPos())
-			else
-				-- porting the player to his death position
-				p:SetPos(p.occ_data.death_pos)
-			end
-
 			-- set player HP to 100
 			p:SetHealth(p:GetMaxHealth())
 
 			-- set was revived flag
 			p.occ_data.was_revived = true
+
+			-- remove status
+			STATUS:RemoveStatus(p, "ttt2_occultist_revival")
 
 			-- make sound if boolean is true
 			if respawn_sound then
@@ -183,7 +165,8 @@ if SERVER then
 		true, -- force revival
 		function(p)
 			-- on fail todo
-		end)
+		end,
+		spawn_pos) -- the player's respawn position (If nil, will be their corpse if present, or their point of death otherwise. If the spawn is unsafe, map spawn is used instead)
 	end)
 
 	local next_think = 0
@@ -230,6 +213,12 @@ if SERVER then
 					tbl[occul] = {ROLE_NONE, TEAM_NONE}
 				end
 			end
+		end
+	end)
+
+	hook.Add("TTT2UpdateSubrole", "ttt2_role_occultist_update_subrole", function(ply, old_subrole, subrole)
+		if old_subrole == ROLE_OCCULTIST then
+			STATUS:RemoveStatus(ply, "ttt2_occultist_revival")
 		end
 	end)
 
