@@ -250,9 +250,17 @@ if CLIENT then
 	function ROLE:AddToSettingsMenu(parent)
 		local form = vgui.CreateTTT2Form(parent, "header_roles_additional")
 
+		form:MakeHelp({
+			label = "label_occultist_buff_intel"
+		})
+
 		form:MakeCheckBox({
 			serverConvar = "ttt_occultist_receive_buff_to_beginning",
 			label = "label_occultist_receive_buff_to_beginning"
+		})
+
+		form:MakeHelp({
+			label = "label_occultist_map_tp_intel"
 		})
 
 		form:MakeCheckBox({
@@ -260,9 +268,17 @@ if CLIENT then
 			label = "label_occultist_teleport_to_mapspawn"
 		})
 
+		form:MakeHelp({
+			label = "label_occultist_rev_sound_intel"
+		})
+
 		form:MakeCheckBox({
 			serverConvar = "ttt_occultist_play_respawn_sound",
 			label = "label_occultist_play_respawn_sound"
+		})
+
+		form:MakeHelp({
+			label = "label_occultist_rev_epop_intel"
 		})
 
 		form:MakeCheckBox({
@@ -270,9 +286,17 @@ if CLIENT then
 			label = "label_occultist_announce_revival_by_popup"
 		})
 
+		form:MakeHelp({
+			label = "label_occultist_hide_ident_intel"
+		})
+
 		form:MakeCheckBox({
 			serverConvar = "ttt_occultist_hide_identity",
 			label = "label_occultist_hide_identity"
+		})
+
+		form:MakeHelp({
+			label = "label_occultist_hp_threshold_intel"
 		})
 
 		form:MakeSlider({
@@ -283,6 +307,10 @@ if CLIENT then
 			decimal = 0			
 		})
 
+		form:MakeHelp({
+			label = "label_occultist_rev_time_intel"
+		})
+
 		form:MakeSlider({
 			serverConvar = "ttt_occultist_respawn_time",
 			label = "label_occultist_respawn_time",
@@ -291,12 +319,21 @@ if CLIENT then
 			decimal = 0	
 		})
 
+		form:MakeHelp({
+			label = "label_occultist_fire_radius_intel"
+		})
+
+
 		form:MakeSlider({
 			serverConvar = "ttt_occultist_fire_radius",
 			label = "label_occultist_fire_radius",
 			min = 0,
 			max = 500,
 			decimal = 0	
+		})
+
+		form:MakeHelp({
+			label = "label_occultist_fire_damage_intel"
 		})
 
 		form:MakeSlider({
