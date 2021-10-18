@@ -246,4 +246,65 @@ if CLIENT then
 			type = "good"
 		})
 	end)
+
+	function ROLE:AddToSettingsMenu(parent)
+		local form = vgui.CreateTTT2Form(parent, "header_roles_additional")
+
+		form:MakeCheckBox({
+			serverConvar = "ttt_occultist_receive_buff_to_beginning",
+			label = "label_occultist_receive_buff_to_beginning"
+		})
+
+		form:MakeCheckBox({
+			serverConvar = "ttt_occultist_teleport_to_mapspawn",
+			label = "label_occultist_teleport_to_mapspawn"
+		})
+
+		form:MakeCheckBox({
+			serverConvar = "ttt_occultist_play_respawn_sound",
+			label = "label_occultist_play_respawn_sound"
+		})
+
+		form:MakeCheckBox({
+			serverConvar = "ttt_occultist_announce_revival_by_popup",
+			label = "label_occultist_announce_revival_by_popup"
+		})
+
+		form:MakeCheckBox({
+			serverConvar = "ttt_occultist_hide_identity",
+			label = "label_occultist_hide_identity"
+		})
+
+		form:MakeSlider({
+			serverConvar = "ttt_occultist_health_threshold",
+			label = "label_occultist_health_threshold",
+			min = 0,
+			max = 100,
+			decimal = 0			
+		})
+
+		form:MakeSlider({
+			serverConvar = "ttt_occultist_respawn_time",
+			label = "label_occultist_respawn_time",
+			min = 0,
+			max = 100,
+			decimal = 0	
+		})
+
+		form:MakeSlider({
+			serverConvar = "ttt_occultist_fire_radius",
+			label = "label_occultist_fire_radius",
+			min = 0,
+			max = 500,
+			decimal = 0	
+		})
+
+		form:MakeSlider({
+			serverConvar = "ttt_occultist_fire_damagescale",
+			label = "label_occultist_fire_damagescale",
+			min = 0,
+			max = 1,
+			decimal = 2	
+		})
+	end
 end

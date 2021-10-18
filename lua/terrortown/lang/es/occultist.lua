@@ -1,4 +1,4 @@
-L = LANG.GetLanguageTableReference("es")
+local L = LANG.GetLanguageTableReference("es")
 
 -- GENERAL ROLE LANGUAGE STRINGS
 L[OCCULTIST.name] = "Ocultista"
